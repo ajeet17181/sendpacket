@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 			}
 
 	}else{
-		name = argv[1];
+		name = argv[2];
 		/** ask pcap for the network address and mask of the device, needed afterwards */
 		if(pcap_lookupnet(name,&netp,&maskp,errbuf)<0){
 			fprintf(stderr,"Error getting IPv4 network address and mask of device %s: %s\n", name, errbuf);
@@ -231,7 +231,7 @@ int main(int argc, char **argv)
 	ip_hdr->ip_len = htons(pkt_size-sizeof(struct ether_header));
 	ip_hdr->ip_id = htons(2);
 	ip_hdr->ip_off = htons(IP_DF); ///< fragment offset field (don't fragment)
-	ip_hdr->ip_ttl = 3;
+	ip_hdr->ip_ttl = 255;
 	ip_hdr->ip_p = IPPROTO_NONE;	///< protocol
 	memcpy(&ip_hdr->ip_src,&srcip,sizeof(struct in_addr));
 	memcpy(&ip_hdr->ip_dst,&dstip,sizeof(struct in_addr));
