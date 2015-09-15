@@ -2,7 +2,7 @@
  ============================================================================
  Name        : sendpacket.c
  Author      : davidfdzp
- Version     : 0.1
+ Version     : 0.2
  Copyright   : Based on WinPcap and http://www.binarytides.com/raw-sockets-packets-with-winpcap/
  Description : send raw IP packets in Windows with Cygwin
  ============================================================================
@@ -36,11 +36,6 @@ int main(int argc, char **argv)
 	char errbuf[PCAP_ERRBUF_SIZE];
 	u_int8_t packet[PKT_SIZE];
 	int i;
-
-	struct ifreq if_data;
-
-	/** Socket used to send ICMP over IPv4 packets */
-	int sock_icmp;
 
 	struct in_addr dstip;
 	struct in_addr srcip;
@@ -201,26 +196,18 @@ int main(int argc, char **argv)
 		}
 	}
 
-	printf("Dst MAC: %x:%x:%x:%x:%x:%x\n",
+	printf("Dst MAC: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n",
 			eth_hdr->dst[0], eth_hdr->dst[1],
 			eth_hdr->dst[2], eth_hdr->dst[3],
 			eth_hdr->dst[4], eth_hdr->dst[5]);
 
-	/** Open ICMP IPv4 socket to get adapter HW address */
-	sock_icmp = socket(PF_INET,SOCK_RAW,IPPROTO_ICMP);
-	/* Stop receiving data by the ICMP socket */
-	shutdown(sock_icmp,SHUT_RD);
 	/** Get adapter HW address */
-	strcpy(if_data.ifr_name,name);
-	ioctl(sock_icmp,SIOCGIFHWADDR,&if_data);
+	GetMacAddress(eth_hdr->src, SrcIP);
+	printf("Src MAC: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n",
+			eth_hdr->src[0],eth_hdr->src[1],
+			eth_hdr->src[2],eth_hdr->src[3],
+			eth_hdr->src[4],eth_hdr->src[5]);
 
-	printf("Src MAC: %x:%x:%x:%x:%x:%x\n",
-				if_data.ifr_hwaddr.sa_data[0], if_data.ifr_hwaddr.sa_data[1],
-				if_data.ifr_hwaddr.sa_data[2], if_data.ifr_hwaddr.sa_data[3],
-				if_data.ifr_hwaddr.sa_data[4], if_data.ifr_hwaddr.sa_data[5]);
-
-	/* set mac source to retrieved HW address */
-	memcpy(&eth_hdr->src,if_data.ifr_hwaddr.sa_data,ETHER_ADDR_LEN);
 	/* set ethertype to IP */
 	eth_hdr->type=htons(0x0800);
 
@@ -255,7 +242,6 @@ int main(int argc, char **argv)
 	}
 
 	pcap_close(fp);
-	/** Close ICMP IPv4 socket */
-	close(sock_icmp);
+
 	return EXIT_SUCCESS;
 }

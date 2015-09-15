@@ -81,7 +81,7 @@ See /usr/include/netinet/ip6.h
 
 /* UDP header: /usr/include/netinet/udp.h */
 
-// void GetMacAddress(unsigned char *mac , in_addr destip); // not need, done using ICMP socket and ioctl call
+void GetMacAddress(unsigned char *mac, IPAddr destip);
 void GetGateway(struct in_addr ip , char *sgatewayip , int *gatewayip);
 unsigned short in_checksum(unsigned short *ptr,int nbytes);
 

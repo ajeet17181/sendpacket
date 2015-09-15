@@ -5,6 +5,21 @@
 
 #include "headers.h"
 
+void GetMacAddress(unsigned char *mac, IPAddr destip){
+	IPAddr srcip=0;
+	ULONG MacAddr[2];
+	ULONG PhyAddrLen = ETHER_ADDR_LEN;
+	int i;
+
+	// Now print the MAC address also
+	SendARP(destip, srcip, MacAddr, &PhyAddrLen);
+	if(PhyAddrLen){
+		BYTE *bMacAddr = (BYTE *) & MacAddr;
+		for(i = 0; i < (int) PhyAddrLen; i++)
+			mac[i] = (char)bMacAddr[i];
+	}
+}
+
 void GetGateway(struct in_addr ip , char *sgatewayip , int *gatewayip) {
     char pAdapterInfo[5000];
     PIP_ADAPTER_INFO  AdapterInfo;
